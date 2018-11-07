@@ -107,7 +107,7 @@ export default {
           })
         }
         this.runtimeTranscription = ''
-        this.recognition.start()
+        // this.recognition.start()
       })
       this.recognition.start()
     },
@@ -128,6 +128,9 @@ export default {
       this.transcription = []
       this.parsed = []
       this.text = ''
+      this.previousData=  {index: -1}
+      this.buffer = ''
+      this.array = []
     },
     back() {
       this.isNext = false
@@ -138,8 +141,8 @@ export default {
       }
       if (this.text.length == 0){
         this.text = this.transcription.join(' ')
-        this.isNext = true
         this.data = dataOriginal
+        this.isNext = false
         this.parseText()
       }
       else{
@@ -150,7 +153,7 @@ export default {
       let temporary = ""
       for (let i = 0; i < this.text.length; i++) {
         this.buffer += this.text[i]
-        if (this.text[i] !== ' ') {
+        if (this.text[i] !== ' ' || i==this.text.length-1) {
           let current = this.tryToGetKeyword()
           if (current.index !== -1) {
             if (this.previousData.index !== -1) {
@@ -162,16 +165,27 @@ export default {
           }
         }
       }
-      this.parsed.push(this.getNormalizedValue(this.buffer))
-      // console.log(this.parsed)
+      this.data.forEach((el) => {
+        var flag = true;
+        el.data.forEach((word) => {
+          this.parsed.forEach((key) => {
+            if (key == word) {
+              flag = false;
+            }
+          });
+        });
+        if (flag) {
+          this.parsed.push({keyword: el.label, value: 'нет'});
+        }
+      })
     },
     insert(){
        // console.log(this.parsed)
       for(var i = 0; i<this.parsed['length']; i++){
-        if (this.parsed[i].keyword === 'пол'){
+        if (this.parsed[i].keyword === 'Пол'){
           this.array.push({'Пол' : this.parsed[i].value})
         }
-        if (this.parsed[i].keyword === 'дата рождения'){
+        if (this.parsed[i].keyword === 'Дата рождения'){
           var val = this.parsed[i].value
           var splitted_date = val.split(" ");
           // console.log(splitted_date, val)
@@ -179,7 +193,7 @@ export default {
           var age = 2018 - parseInt(year);
           this.array.push({'Возраст' : age});
         }
-        if (this.parsed[i].keyword === 'предварительный диагноз'){
+        if (this.parsed[i].keyword === 'Предварительный диагноз'){
             this.array.push({'Диагноз' : this.parsed[i].value});
         }
       }
@@ -195,6 +209,7 @@ export default {
       let index = -1
       let position = -1
       let temporary = ''
+      let value
 
       for (let i = 0; i < this.data.length; i++) {
         let element = this.data[i]
@@ -211,9 +226,11 @@ export default {
       }
       if (dataIndex !== -1) {
         temporary = this.data[dataIndex].data.slice()
+        value = this.data[dataIndex].label
         this.data.splice(dataIndex, 1)
       }
       return {
+        value: value,
         keywords: temporary,
         index: dataIndex,
         position: position
@@ -235,7 +252,7 @@ export default {
         }
       }
       return {
-        keyword: maximumKeyword,
+        keyword: this.previousData.value,
         value: value.toLowerCase().replace(maximumKeyword.toLowerCase(), '').replace(/^\s+|\s+$/gm, '')
       }
     },
