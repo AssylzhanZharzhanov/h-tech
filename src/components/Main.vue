@@ -107,7 +107,7 @@ export default {
           })
         }
         this.runtimeTranscription = ''
-        // this.recognition.start()
+        this.recognition.start()
       })
       this.recognition.start()
     },
@@ -186,12 +186,13 @@ export default {
           this.array.push({'Пол' : this.parsed[i].value})
         }
         if (this.parsed[i].keyword === 'Дата рождения'){
-          var val = this.parsed[i].value
-          var splitted_date = val.split(" ");
+          // var val = this.parsed[i].value
+          // var splitted_date = val.split(" ");
           // console.log(splitted_date, val)
-          var year = splitted_date[2];
-          var age = 2018 - parseInt(year);
-          this.array.push({'Возраст' : age});
+          // var year = splitted_date[2];
+          // var age = 2018 - parseInt(year);
+          // this.array.push({'Возраст' : age});
+          this.array.push({'Дата рождения' : this.parsed[i].value});
         }
         if (this.parsed[i].keyword === 'Предварительный диагноз'){
             this.array.push({'Диагноз' : this.parsed[i].value});
