@@ -126,13 +126,14 @@ export default {
         return
       }
       this.transcription = []
-      // this.parsed = []
-      // this.text = ''
-      // this.previousData=  {index: -1}
-      // this.buffer = ''
+      this.parsed = []
+      this.text = ''
+      this.previousData=  {index: -1}
+      this.buffer = ''
       this.array = []
     },
     back() {
+      this.text = ''
       this.isNext = false
     },
     next() {
@@ -141,22 +142,30 @@ export default {
       }
       if (this.text.length == 0){
         this.text = this.transcription.join(' ')
-        this.data = dataOriginal
         this.isNext = false
+        this.data = dataOriginal
         this.parseText()
       }
       else{
+        this.previousData=  {index: -1}
+        this.buffer = ''
+        this.parsed = []
+        this.array = []
+        this.text += this.transcription.join(' ')
+        this.data = dataOriginal
+        this.parseText()
         this.isNext = true
       }
+
     },
     parseText() {
       let temporary = ""
       for (let i = 0; i < this.text.length; i++) {
         this.buffer += this.text[i]
-        if (this.text[i] !== ' ' || i==this.text.length-1) {
+        if (this.text[i] !== ' ' || this.text.length == i+1) {
           let current = this.tryToGetKeyword()
-          if (current.index !== -1) {
-            if (this.previousData.index !== -1) {
+          if (current.index !== -1 ) {
+            if (this.previousData.index !== -1 ) {
               temporary = this.buffer.substr(0, current.position)
               this.parsed.push(this.getNormalizedValue(temporary))
               this.buffer = this.buffer.replace(temporary, '')
@@ -165,6 +174,7 @@ export default {
           }
         }
       }
+      // this.parsed.push(this.getNormalizedValue(this.buffer))
       this.data.forEach((el) => {
           this.parsed.push({keyword: el.label, value: 'нет'});
       })
