@@ -126,10 +126,10 @@ export default {
         return
       }
       this.transcription = []
-      this.parsed = []
-      this.text = ''
-      this.previousData=  {index: -1}
-      this.buffer = ''
+      // this.parsed = []
+      // this.text = ''
+      // this.previousData=  {index: -1}
+      // this.buffer = ''
       this.array = []
     },
     back() {
@@ -166,17 +166,7 @@ export default {
         }
       }
       this.data.forEach((el) => {
-        var flag = true;
-        el.data.forEach((word) => {
-          this.parsed.forEach((key) => {
-            if (key == word) {
-              flag = false;
-            }
-          });
-        });
-        if (flag) {
           this.parsed.push({keyword: el.label, value: 'нет'});
-        }
       })
     },
     insert(){
