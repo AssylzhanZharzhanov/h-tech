@@ -128,44 +128,63 @@ export default {
       this.transcription = []
       this.parsed = []
       this.text = ''
+      this.buffer = ''
+    },
+    back() {
+      this.isNext = false
+      // this.text = this.transcription.join(' ')
       this.previousData=  {index: -1}
       this.buffer = ''
       this.array = []
-    },
-    back() {
-      this.text = ''
-      this.isNext = false
+      // this.data = dataOriginal
+      // // this.parsed = []
+      // console.log("parsed",this.parsed)
+      // console.log("buffer ",this.buffer)
+      // console.log("text",this.text)
+      // console.log("transcription",this.transcription)
+      // console.log("data",this.data)
     },
     next() {
       if (this.transcription.length <= 0) {
         return
       }
-      if (this.text.length == 0){
+      // if (this.text.length == 0){
         this.text = this.transcription.join(' ')
-        this.isNext = false
-        this.data = dataOriginal
-        this.parseText()
-      }
-      else{
-        this.previousData=  {index: -1}
-        this.buffer = ''
-        this.parsed = []
-        this.array = []
-        this.text += this.transcription.join(' ')
-        this.data = dataOriginal
-        this.parseText()
         this.isNext = true
-      }
-
+        this.data = dataOriginal.slice()
+        this.parsed = []
+        this.parseText()
+        console.log("parsed",this.parsed)
+        console.log("buffer ",this.buffer)
+        console.log("text",this.text)
+        console.log("transcription",this.transcription)
+        console.log("data",this.data)
+      // }
+      // else{
+      //   this.text = this.transcription.join(' ')
+      //   this.previousData=  {index: -1}
+      //   this.buffer = ''
+      //   this.array = []
+      //   this.data = dataOriginal
+      //   this.parsed = []
+      //   this.isNext = true
+      //   console.log("parsed",this.parsed)
+      //   console.log("buffer ",this.buffer)
+      //   console.log("text",this.text)
+      //   console.log("transcription",this.transcription)
+      //   console.log("data",this.data)
+      //
+      //   this.parseText()
+      // }
     },
     parseText() {
       let temporary = ""
       for (let i = 0; i < this.text.length; i++) {
         this.buffer += this.text[i]
-        if (this.text[i] !== ' ' || this.text.length == i+1) {
+        if (this.text[i] !== ' ') {
           let current = this.tryToGetKeyword()
-          if (current.index !== -1 ) {
-            if (this.previousData.index !== -1 ) {
+          if (current.index !== -1) {
+            if (this.previousData.index !== -1) {
               temporary = this.buffer.substr(0, current.position)
               this.parsed.push(this.getNormalizedValue(temporary))
               this.buffer = this.buffer.replace(temporary, '')
@@ -174,27 +193,37 @@ export default {
           }
         }
       }
-      // this.parsed.push(this.getNormalizedValue(this.buffer))
+      this.parsed.push(this.getNormalizedValue(this.buffer))
+
       this.data.forEach((el) => {
           this.parsed.push({keyword: el.label, value: 'нет'});
       })
+      // console.log(this.parsed)
+    },
+    copy(mainObj) {
+      let objCopy = {}; // objCopy will store a copy of the mainObj
+      let key;
+
+      for (key in mainObj) {
+        objCopy[key] = mainObj[key]; // copies each property to the objCopy object
+      }
+      return objCopy;
     },
     insert(){
        // console.log(this.parsed)
       for(var i = 0; i<this.parsed['length']; i++){
-        if (this.parsed[i].keyword === 'Пол'){
+        if (this.parsed[i].keyword === 'пол'){
           this.array.push({'Пол' : this.parsed[i].value})
         }
-        if (this.parsed[i].keyword === 'Дата рождения'){
-          // var val = this.parsed[i].value
-          // var splitted_date = val.split(" ");
+        if (this.parsed[i].keyword === 'дата рождения'){
+          var val = this.parsed[i].value
+          var splitted_date = val.split(" ");
           // console.log(splitted_date, val)
-          // var year = splitted_date[2];
-          // var age = 2018 - parseInt(year);
-          // this.array.push({'Возраст' : age});
-          this.array.push({'Дата рождения' : this.parsed[i].value});
+          var year = splitted_date[2];
+          var age = 2018 - parseInt(year);
+          this.array.push({'Возраст' : age});
         }
-        if (this.parsed[i].keyword === 'Предварительный диагноз'){
+        if (this.parsed[i].keyword === 'предварительный диагноз'){
             this.array.push({'Диагноз' : this.parsed[i].value});
         }
       }
